@@ -9,7 +9,7 @@ and (2) **STEP 2**, using an extended version of the gDel_minRN algorithm that i
 
 DBgDel Framework Overview|
 :-------------------------:|
-| <img width="1000" alt="image" src="https://github.com/yangziwei96/DBgDel/blob/main/ov.png">
+| <img width="1000" alt="image" src="https://github.com/MetNetComp/DBgDel/blob/main/ov.png">
 
 ## Necessary Environments
 
