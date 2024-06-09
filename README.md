@@ -80,7 +80,7 @@ main()
 
 For more detailed information, please refer to the comments within the source code.
 
-Output Details:
+## Output Details:
 
 - The output CSV file `Remaining_gene.csv` will have a single column titled Remaining_gene, containing the genes in the initial remaining gene set.
 
