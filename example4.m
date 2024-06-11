@@ -8,7 +8,7 @@ model=iML1515;
 initial_remaining_gene_pool = readtable('initial_remaining_gene/iML1515_ex.csv', 'Delimiter', ',').Remaining_gene.';
 % Start the timer
 tic;
-[gvalue,gr,pr,it,success]=DBgDel(model,'ribflv_c',10,0.1,0.1,initial_remaining_gene_pool);
+[gvalue,gr,pr,it,success]=DBgDel(model,'ribflv_c',50,0.1,0.1,initial_remaining_gene_pool);
 
 % Stop the timer and display the elapsed time
 elapsedTime = toc;

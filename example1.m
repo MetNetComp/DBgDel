@@ -7,7 +7,7 @@ model=iMM904;
 initial_remaining_gene_pool = readtable('initial_remaining_gene/iMM904_ex.csv', 'Delimiter', ',').Remaining_gene.';
 % Start the timer
 tic;
-[gvalue,gr,pr,it,success]=DBgDel(model,'pnto__R_c',10,0.1,0.1,initial_remaining_gene_pool);
+[gvalue,gr,pr,it,success]=DBgDel(model,'pnto__R_c',50,0.1,0.1,initial_remaining_gene_pool);
 
 % Stop the timer and display the elapsed time
 elapsedTime = toc;
