@@ -125,7 +125,7 @@ For example, the RC gene set is given by Function `RC_gene_selector(model, RC_si
 - Calls this function to randomly select a specified number of genes (`RS_size`) from a metabolic model (`model`).
 - The resulting RC gene list is saved to `initial_remaining_gene/RS_genes_model_name.csv`.
 
-The other initial remaining gene pool settings are also available for testing in file path `initial_remaining_gene`:
+The other initial remaining gene pool settings are also available for testing in file path `Ablation_Test_and_Baselines`:
 - RC genes: `Ablation_Test_and_Baselines/RC_genes_model_name.csv`.
 - GE genes: `Ablation_Test_and_Baselines/GE_genes_model_name.csv`.
 - $G_{\text{remain}}$ genes: `Ablation_Test_and_Baselines/G_remain_model_name.csv`.
