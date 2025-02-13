@@ -113,6 +113,34 @@ The calculation results for these examples are available in the following files:
 `Example_results/biotin_Strategy.mat`
 `Example_results/riboflavin_Strategy.mat`
 
+## Ablation Test and Baselines
+DBgDel ablation variants are based on different initial remaining gene pool settings, including:
+
+- Randomly Chosen (RC) genes.
+- Growth Essential (GE) genes.
+- $G_{\text{remain}}$ genes.
+
+For example, the RC gene set is given by Function `RC_gene_selector(model, RC_size)`:
+
+- Calls this function to randomly select a specified number of genes (`RS_size`) from a metabolic model (`model`).
+- The resulting RC gene list is saved to `initial_remaining_gene/RS_genes_model_name.csv`.
+
+The other initial remaining gene pool settings are also available for testing in file path `initial_remaining_gene`:
+- RC genes: `initial_remaining_gene/RC_genes_model_name.csv`.
+- GE genes: `initial_remaining_gene/GE_genes_model_name.csv`.
+- $G_{\text{remain}}$ genes: `initial_remaining_gene/G_remain_model_name.csv`.
+
+Here are some examples using RC genes as the initial remaining gene pool:
+- RC_Example 1: Gene deletion strategy for pantothenate in iMM904, using RC genes as the initial remaining gene pool.
+- RC_Example 2: Gene deletion strategy for succinate in iMM904, using RC genes as the initial remaining gene pool.
+- RC_Example 3: Gene deletion strategy for biotin in iML1515, using RC genes as the initial remaining gene pool.
+- RC_Example 4: Gene deletion strategy for riboflavin in iML1515, using RC genes as the initial remaining gene pool.
+
+The baseline methods include GDLS [1], optGene [2], gMCSE [3], and gDel_minRN [4]. 
+GDLS and optGene are available in the MATLAB COBRA Toolbox [5]; please refer to [COBRA Toolbox](https://opencobra.github.io/cobratoolbox/stable/index.html) for detailed instructions.
+
+gMCSE and gDel_minRN are provided as open-source tools implemented in MATLAB; please refer to the original papers for detailed instructions and environments setup, and refer to [gMCSE](https://www2.mpi-magdeburg.mpg.de/projects/cna/etcdownloads.html) and [gDel_minRN](https://github.com/MetNetComp/gDel-minRN) for the resources.
+
 ## Output Details
 The output contains a matrix `gvalue`, where:
 
@@ -122,3 +150,14 @@ The output contains a matrix `gvalue`, where:
   - 1: Gene to remain.
     
 For more detailed information, please refer to the comments within the source code.
+
+## References
+[1] Lun D S, Rockwell G, Guido N J, et al. Large‐scale identification of genetic design strategies using local search[J]. molecular systems biology, 2009, 5(1): 296.
+
+[2] Rocha I, Maia P, Rocha M, et al. OptGene: a framework for in silico metabolic engineering[C]//10th International Conference on Chemical and Biological Engineering. Portugal: University of Minho, 2008: 218-219.
+
+[3] von Kamp A, Klamt S. Growth-coupled overproduction is feasible for almost all metabolites in five major production organisms[J]. Nature communications, 2017, 8(1): 15956.
+
+[4] Tamura T, Muto-Fujita A, Tohsato Y, et al. Gene deletion algorithms for minimum reaction network design by mixed-integer linear programming for metabolite production in constraint-based models: gDel_minRN[J]. Journal of Computational Biology, 2023, 30(5): 553-568.
+
+[5] Heirendt L, Arreckx S, Pfau T, et al. Creation and analysis of biochemical constraint-based models using the COBRA Toolbox v. 3.0[J]. Nature protocols, 2019, 14(3): 639-702.
