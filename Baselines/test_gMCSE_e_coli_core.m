@@ -11,7 +11,7 @@ startcna;
 load('e_coli_core.mat');
 ori_model = e_coli_core;
 % Read the target CSV
-Targetlist = readtable('test_target_e_coli_core_no_e.csv', 'Delimiter', ',');
+Targetlist = readtable('possible_target_e_coli_core_no_e.csv', 'Delimiter', ',');
 % Extract the first column as a cell array (useful for strings)
 productionList = Targetlist{:, 1}; 
 % Read the e_coli_core_RID file (gene-pseudoreaction-ID)
