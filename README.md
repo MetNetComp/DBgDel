@@ -206,6 +206,10 @@ The results for each target are recorded, and the experiment summary is reported
   - 0: Failed GCP
   - 1: Successful GCP
 
+**(d) Example Test**
+
+We provide a script to make a quick small-scale example test on gMCSE:
+- `Baselines/test_gMCSE.m`: test on 10 target metabolites on **iMM904** model.
 
 ### 2. gDel_minRN
 
