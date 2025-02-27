@@ -27,7 +27,7 @@ To run DBgDel, you need an environment with the following:
 
 ## Download the Gene Deletion Strategy Data
 
-The maximal gene deletion strategy data (specifying a model and a target metabolite) can be downloaded from MetNetComp via the following URL:
+The maximal gene deletion strategy data (specifying a model and a target metabolite) can be downloaded from [MetNetComp](https://metnetcomp.github.io/database1/indexFiles/index.html) via the following URL:
 
 ```
 https://metnetcomp.github.io/database1/csv/<model>&<target metabolite>&core.csv
@@ -113,34 +113,6 @@ The calculation results for these examples are available in the following files:
 `Example_results/biotin_Strategy.mat`
 `Example_results/riboflavin_Strategy.mat`
 
-## Ablation Test and Baselines
-DBgDel ablation variants are based on different initial remaining gene pool settings, including:
-
-- Randomly Chosen (RC) genes.
-- Growth Essential (GE) genes.
-- $G_{\text{remain}}$ genes.
-
-For example, the RC gene set is given by Function `RC_gene_selector(model, RC_size)`:
-
-- Calls this function to randomly select a specified number of genes (`RS_size`) from a metabolic model (`model`).
-- The resulting RC gene list is saved to `Ablation_Test_and_Baselines/RS_genes_model_name.csv`.
-
-The other initial remaining gene pool settings are also available for testing in file path `Ablation_Test_and_Baselines`:
-- RC genes: `Ablation_Test_and_Baselines/RC_genes_model_name.csv`.
-- GE genes: `Ablation_Test_and_Baselines/GE_genes_model_name.csv`.
-- $G_{\text{remain}}$ genes: `Ablation_Test_and_Baselines/G_remain_model_name.csv`.
-
-Here are some examples using RC genes as the initial remaining gene pool:
-- RC_Example 1: Gene deletion strategy for pantothenate in iMM904, using RC genes as the initial remaining gene pool.
-- RC_Example 2: Gene deletion strategy for succinate in iMM904, using RC genes as the initial remaining gene pool.
-- RC_Example 3: Gene deletion strategy for biotin in iML1515, using RC genes as the initial remaining gene pool.
-- RC_Example 4: Gene deletion strategy for riboflavin in iML1515, using RC genes as the initial remaining gene pool.
-
-The baseline methods include GDLS [1], optGene [2], gMCSE [3], and gDel_minRN [4]. 
-GDLS and optGene are available in the MATLAB COBRA Toolbox [5]; please refer to [COBRA Toolbox](https://opencobra.github.io/cobratoolbox/stable/index.html) for detailed instructions.
-
-gMCSE and gDel_minRN are provided as open-source tools implemented in MATLAB; please refer to the original papers for detailed instructions and environments setup, and refer to [gMCSE](https://www2.mpi-magdeburg.mpg.de/projects/cna/etcdownloads.html) and [gDel_minRN](https://github.com/MetNetComp/gDel-minRN) for the resources.
-
 ## Output Details
 The output contains a matrix `gvalue`, where:
 
@@ -151,13 +123,121 @@ The output contains a matrix `gvalue`, where:
     
 For more detailed information, please refer to the comments within the source code.
 
+## DBgDel Ablation Test
+DBgDel ablation variants are based on different initial remaining gene pool settings, including:
+
+- Randomly Chosen (RC) genes.
+- Growth Essential (GE) genes.
+- $G_{\text{remain}}$ genes.
+
+For example, the RC gene set is given by Function `RC_gene_selector(model, RC_size)`:
+
+- Calls this function to randomly select a specified number of genes (`RC_size`) from a metabolic model (`model`).
+- The resulting RC gene list is saved to `initial_remaining_gene/RC_genes_model_name.csv`.
+
+The other initial remaining gene pool settings are also available for testing in file path `initial_remaining_gene`:
+- RC genes: `initial_remaining_gene/RC_genes_model_name.csv`.
+- GE genes: `initial_remaining_gene/GE_genes_model_name.csv`.
+- $G_{\text{remain}}$ genes: `initial_remaining_gene/G_remain_model_name.csv`.
+
+Here are some examples using RC genes as the initial remaining gene pool:
+- RC_Example 1: Gene deletion strategy for pantothenate in iMM904, using RC genes as the initial remaining gene pool.
+- RC_Example 2: Gene deletion strategy for succinate in iMM904, using RC genes as the initial remaining gene pool.
+- RC_Example 3: Gene deletion strategy for biotin in iML1515, using RC genes as the initial remaining gene pool.
+- RC_Example 4: Gene deletion strategy for riboflavin in iML1515, using RC genes as the initial remaining gene pool.
+
+The output file format of the above ablation variants remains the same as the original DBgDel.
+
+## Baseline Test (Updated)
+
+Baseline methods for comparison include **gMCSE** [1], **gDel_minRN** [2], **GDLS** [3], and **optGene** [4]. Among them, gMCSE is a minimal cut set (MCS)-based method, while the others are based on elementary flux vectors (EFVs).
+Below, we provide detailed experimental setups and source code to ensure fair reproduction and facilitate further research.
+All the codes are available in file path `Baselines`.
+
+### 1. gMCSE
+gMCSE is provided as an open-source tool implemented in MATLAB; please refer to the original papers for detailed instructions, and refer to [gMCSE](https://www2.mpi-magdeburg.mpg.de/projects/cna/etcdownloads.html) for the resources.
+
+**(a) Environments Setup**
+
+To implement large-scale baseline experiments on gMCSE, we used the API function `CNAgeneMCSEnumerator2` from CellNetAnalyzer [5] (ver. 2023.1). For more details and access to the latest version of CellNetAnalyzer, please refer to [CellNetAnalyzer](https://www2.mpi-magdeburg.mpg.de/projects/cna/etcdownloads.html).
+For small-scale tests on a few targets, we recommend using the GUI provided by CellNetAnalyzer, as it enables more straightforward parameter configuration.
+
+gMCSE requires MATLAB computational tools such as EFMTool, which rely on Java to handle large-scale calculations. In our cases, MATLAB runs on a Java Virtual Machine (JVM), and the default memory limit may be insufficient for memory-intensive tasks like MCS computation. This can result in errors, slowdowns, interruptions, or incorrect termination of computations. To prevent this, we provide the function `setJavaHeapSize(sizeGB),` which is strongly recommended to use before experiments for manually adjusting the Java heap size based on the available system RAM.
+
+
+**(b) gMCSE Parameter Setup**
+
+The gMCSE method requires several key parameters (`D`, `d`, `T`, and `t`) to set up the Desired Region and Target Region during calculations. Incorrect setup of these parameters can lead to false results.The recommended setup for gMCSE is as follows:
+- Desired Region (D * r <= d): Ensure growth is greater than or equal to the GR_threshold. (The metabolism must support growth.)
+- Target Region (T * r <= t): Ensure growth is greater than or equal to the GR_threshold, and production is less than or equal to the PR_threshold. (Metabolism must no longer be able to grow while no product is produced.)
+
+For compatibility with gMCSE, it is necessary to rewrite these constraints as matrix-vector multiplications:
+- D * r <= d (1xN matrix and 1x1 vector): -growth <= -GR_threshold
+- T * r <= t (2xN matrix and 2x1 vector): -growth <= -GR_threshold, production <= PR_threshold
+
+To simplify the setup of gMCSE, we provide two functions that help easily define the constraints as described above:
+- `initializeDesiredRegion(cnap_numr, growth_idx, GR_threshold)`: Initializes `D` and `d` based on the given growth reaction in the model and the GR_threshold.
+- `initializeTargetRegion(cnap_numr, growth_idx, production_idx, GR_threshold, PR_threshold)`: Initializes `T` and `t` based on the given growth reaction, target production reaction in the model, GR_threshold, and PR_threshold.
+
+**(c) Result Reports on Computational Experiments**
+
+We provide scripts to reproduce the tests on the reported results for gMCSE:
+- `Baselines/test_gMCSE_e_coli_core.m`: computational experiments on **e_coli_core** model (refer to **TABLE VIII**).
+- `Baselines/test_gMCSE_iMM904.m`: computational experiments on **iMM904** model (refer to **TABLE X**).
+- `Baselines/test_gMCSE_iML1515.m`: computational experiments on **iML1515** model (refer to **TABLE XII**).
+
+Note_1: As mentioned above in **(a) Environment Setup**, we provide an additional function `cleanUpBeforeNewModel()` to reset MATLAB memory and parallel pool usage before loading and running a new model. 
+We strongly recommend testing one model at a time and calling this function before each new round of computation.
+
+Note_2: The final report is based on the results of the `GRPRchecker()` function, which checks whether the resulting gene deletions achieve GCP for each target in the original model considering the GPR rules setup in this study.
+
+The results for each target are recorded, and the experiment summary is reported in the file `Baselines/model_name_results_check.csv`
+- ProductionIdx: Refers to the target ID in each model.
+- TimeCost: Elapsed time for each target, along with the average elapsed time.
+- Status: The output from gMCSE, with the following codes (only status codes 0 and 3 give feasible gene deletions):
+  - 0: Successful
+  - 1: Timeout with no solution
+  - 2: Infeasible 
+  - 3: Timeout with some solutions
+- DeletedGenes: The set of deleted genes.
+- GR: The GR check result based on the knockout of DeletedGenes.
+- PR: The PR check result based on the knockout of DeletedGenes.
+- Success:
+  - 0: Failed GCP
+  - 1: Successful GCP
+
+
+### 2. gDel_minRN
+
+**(a) Computational Experiments Setup**
+
+gDel_minRN is provided as an open-source tool implemented in MATLAB; please refer to the original papers for detailed instructions and environment setup, and refer to [gDel_minRN](https://github.com/MetNetComp/gDel-minRN) for the resource download.
+
+**(b) Result Reports on Computational Experiments**
+
+We provide the script to reproduce the tests on the reported results for gDel_minRN:
+- `Baselines/test_gDel_minRN.m`: computational experiments on all three models (**e_coli_core, iMM904, and iML1515**).
+
+
+### 3. GDLS and optGene
+
+**(a) Computational Experiments Setup**
+
+GDLS and optGene are available in the MATLAB COBRA Toolbox [6]; please refer to [COBRA Toolbox](https://opencobra.github.io/cobratoolbox/stable/index.html) for detailed instructions and resource download.
+
+**(b) Result Reports on Computational Experiments**
+
+- `Baselines/test_GDLS_optGene.m`: computational experiments on all three models (**e_coli_core, iMM904, and iML1515**).
+
 ## References
-[1] Lun D S, Rockwell G, Guido N J, et al. Large‐scale identification of genetic design strategies using local search[J]. molecular systems biology, 2009, 5(1): 296.
+[1] von Kamp A, Klamt S. Growth-coupled overproduction is feasible for almost all metabolites in five major production organisms[J]. Nature communications, 2017, 8(1): 15956.
 
-[2] Rocha I, Maia P, Rocha M, et al. OptGene: a framework for in silico metabolic engineering[C]//10th International Conference on Chemical and Biological Engineering. Portugal: University of Minho, 2008: 218-219.
+[2] Tamura T, Muto-Fujita A, Tohsato Y, et al. Gene deletion algorithms for minimum reaction network design by mixed-integer linear programming for metabolite production in constraint-based models: gDel_minRN[J]. Journal of Computational Biology, 2023, 30(5): 553-568.
 
-[3] von Kamp A, Klamt S. Growth-coupled overproduction is feasible for almost all metabolites in five major production organisms[J]. Nature communications, 2017, 8(1): 15956.
+[3] Lun D S, Rockwell G, Guido N J, et al. Large‐scale identification of genetic design strategies using local search[J]. molecular systems biology, 2009, 5(1): 296.
 
-[4] Tamura T, Muto-Fujita A, Tohsato Y, et al. Gene deletion algorithms for minimum reaction network design by mixed-integer linear programming for metabolite production in constraint-based models: gDel_minRN[J]. Journal of Computational Biology, 2023, 30(5): 553-568.
+[4] Rocha I, Maia P, Rocha M, et al. OptGene: a framework for in silico metabolic engineering[C]//10th International Conference on Chemical and Biological Engineering. Portugal: University of Minho, 2008: 218-219.
 
-[5] Heirendt L, Arreckx S, Pfau T, et al. Creation and analysis of biochemical constraint-based models using the COBRA Toolbox v. 3.0[J]. Nature protocols, 2019, 14(3): 639-702.
+[5] Klamt S, Saez-Rodriguez J, Gilles E D. Structural and functional analysis of cellular networks with CellNetAnalyzer[J]. BMC systems biology, 2007, 1: 1-13.
+
+[6] Heirendt L, Arreckx S, Pfau T, et al. Creation and analysis of biochemical constraint-based models using the COBRA Toolbox v. 3.0[J]. Nature protocols, 2019, 14(3): 639-702.
