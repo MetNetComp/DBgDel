@@ -192,7 +192,7 @@ We strongly recommend testing one model at a time and calling this function befo
 Note_2: The final report is based on the results of the `GRPRchecker()` function, which checks whether the resulting gene deletions achieve GCP for each target in the original model considering the GPR rules setup in this study.
 
 The results for each target are recorded, and the experiment summary is reported in the file `Baselines/model_name_results_check.csv`
-- ProductionIdx: Refers to the target ID in each model.
+- Target: Refers to the target name in each model.
 - TimeCost: Elapsed time for each target, along with the average elapsed time.
 - Status: The output from gMCSE, with the following codes (only status codes 0 and 3 give feasible gene deletions):
   - 0: Successful
