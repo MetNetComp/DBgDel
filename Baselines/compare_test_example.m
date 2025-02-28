@@ -1,7 +1,7 @@
 function compare_test_example()
     % Step 0: Environment Setup
-    %initCobraToolbox(false);  
-    %startcna;
+    initCobraToolbox(false);  
+    startcna;
     %setJavaHeapSize(8); 
     %parpool('local', 12);
 
@@ -93,4 +93,17 @@ function compare_test_example()
 
     % Display confirmation message
     disp(['Results have been saved to ', output_file]);
+    
+    % Display Results
+    disp('--- DBgDel Results ---');
+    disp(['Target: ', test_target]);
+    disp(['Time cost: ', num2str(overallElapsedTime), ' seconds']);
+    disp(['GR: ', num2str(GR_1)]);
+    disp(['PR: ', num2str(PR_1)]);
+    
+    disp('--- gMCSE Results ---');
+    disp(['Target: ', test_target]);
+    disp(['Time cost: ', num2str(time_cost_gmcse), ' seconds']);
+    disp(['GR: ', num2str(GR_2)]);
+    disp(['PR: ', num2str(PR_2)]);
 end
