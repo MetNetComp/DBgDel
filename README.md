@@ -71,7 +71,7 @@ Explanation:
 Execution:
 
 - The script's main block sets the folder path containing the CSV files and the output file path.
-- Calls the following in `Example_gene_deletion_data` file to test the entire process based on gene selection data on e_coli_core model:
+- Calls the following in `Example_gene_deletion_data` file to test the entire process based on gene deletion data on e_coli_core model:
 
 ```
 python Calculate_InitialG_e_coli_core.py
