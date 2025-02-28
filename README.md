@@ -212,10 +212,15 @@ The results for each target are recorded, and the experiment summary is reported
   - 0: Failed GCP
   - 1: Successful GCP
 
-**(d) Example Test**
+**(d) Quick Example Compare Test**
 
-We provide a script to make a quick small-scale example test on gMCSE:
-- `Baselines/test_gMCSE.m`: test on 10 target metabolites on **iMM904** model.
+We provide a function `compare_test_example()` to make a quick test comparing the results of DBgDel and gMCSE, targeting Succinate (succ_e) in the e_coli_core model.
+The function saves the results into a text file, `compare_test_example_results.txt`, including:
+
+- Target: succ_e
+- Time cost: Running time in seconds
+- GR: The GR check result based on the calculated gene knockout.
+- PR: The GR check result based on the gene knockout.
 
 ### 2. gDel_minRN
 
