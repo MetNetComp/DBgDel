@@ -14,7 +14,7 @@ function RC_gene_selector(model, RC_size)
 
     % Convert to a table and save as CSV
     random_genes_table = table(random_genes, 'VariableNames', {'Remaining_gene'});
-    output_file = fullfile('Ablation_Test_and_Baselines/', ['RC_genes_' inputname(1) '.csv']);
+    output_file = fullfile('initial_remaining_gene/', ['RC_genes_' inputname(1) '.csv']);
     writetable(random_genes_table, output_file);
 
     % Confirm save

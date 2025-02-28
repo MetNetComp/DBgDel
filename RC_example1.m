@@ -7,7 +7,7 @@ model=iMM904;
 %The RC gene set size is defaulted to be 195 in iMM904.
 RC_gene_selector(iMM904,195);
 
-initial_remaining_gene_pool = readtable('Ablation_Test_and_Baselines/RC_genes_iMM904.csv', 'Delimiter', ',').Remaining_gene.';
+initial_remaining_gene_pool = readtable('initial_remaining_gene/RC_genes_iMM904.csv', 'Delimiter', ',').Remaining_gene.';
 % Start the timer
 tic;
 [gvalue,gr,pr,it,success]=DBgDel(model,'pnto__R_c',50,0.1,0.1,initial_remaining_gene_pool);

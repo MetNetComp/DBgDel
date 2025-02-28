@@ -7,7 +7,7 @@ model=iML1515;
 %The RC gene set size is defaulted to be 267 in iML1515.
 RC_gene_selector(iML1515,267);
 
-initial_remaining_gene_pool = readtable('Ablation_Test_and_Baselines/RC_genes_iML1515.csv', 'Delimiter', ',').Remaining_gene.';
+initial_remaining_gene_pool = readtable('initial_remaining_gene/RC_genes_iML1515.csv', 'Delimiter', ',').Remaining_gene.';
 % Start the timer
 tic;
 [gvalue,gr,pr,it,success]=DBgDel(model,'btn_c',50,0.1,0.1,initial_remaining_gene_pool);
