@@ -226,7 +226,7 @@ The function saves the results into a text file, `compare_test_example_results.t
 - Target: succ_e
 - Time cost: Running time in seconds
 - GR: The GR check result based on the calculated gene knockout.
-- PR: The GR check result based on the gene knockout.
+- PR: The PR check result based on the calculated gene knockout.
 
 ### 2. gDel_minRN
 
