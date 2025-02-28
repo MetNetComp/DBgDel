@@ -1,228 +1,48 @@
-function [gvalue gr pr it success] = gDel_minRN(model,targetMet,maxLoop,PRLB,GRLB)
-% gDel-minRN that determines gene deletion strategies 
-%by mixed integer linear programming to achieve growth coupling 
-%for the target metabolite by repressing the maximum number of reactions 
-%via gene-protein-reaction relations.
-%
-%function [vg gr pr it success]  
-%   = gDel_minRN(model,targetMet,maxit,PRLB,GRLB)
-%
-%INPUTS
-% model     COBRA model structure containing the following required fields to perform gDel_minRN.
-%   rxns                    Rxns in the model
-%   mets                    Metabolites in the model
-%   genes               Genes in the model
-%   grRules            Gene-protein-reaction relations in the model
-%   S                       Stoichiometric matrix (sparse)
-%   b                       RHS of Sv = b (usually zeros)
-%   c                       Objective coefficients
-%   lb                      Lower bounds for fluxes
-%   ub                      Upper bounds for fluxes
-%   rev                     Reversibility of fluxes
-%
-% targetMet   target metabolites
-%             (e.g.,  'btn_c')
-% maxLoop   the maximum number of iterations in gDel_minRN
-% PRLB           the minimum required production rates of the target metabolites
-%                     when gDel-minRN searches the gene deletion
-%                     strategy candidates. 
-%                     (But it is not ensured to achieve this minimum required value
-%                      when GR is maximized withoug PRLB.)
-% GRLB         the minimum required growth rate 
-%                     when gDel-minRN searches the gene deletion
-%                     strategy candidates. 
-%
-%OUTPUTS
-% gvalue     The first column is the list of genes in the original model.
-%            The second column contains a 0/1 vector indicating which genes should be deleted.
-%             0 indicates genes to be deleted.
-%             1 indecates genes to be remained.
-% gr         the growth rate obained when the gene deletion strategy is
-%              applied and the growth rate is maximized.
-% pr         the target metabolite production rate obained 
-%              when the gene deletion strategy is applied and the growth rate is maximized.
-% it       indicates how many iterations were necessary to obtain the
-%              solution.
-% success  indicates whether gDel_minRN obained an appropriate gene
-%               deletion strategy. (1:success, 0:failure)
-%
-%   Jun. 21, 2022  Takeyuki TAMURA
-%
+%CobraToolbox&Solver
+initCobraToolbox(false)
+changeCobraSolver('ibm_cplex', 'all', 1);
 
-%for i=1:size(model.genes,1)
-%    model.genes{i}=strrep(model.genes{i},'_','');
-%end
-%for i=1:size(model.grRules,1)
-%    model.grRules{i}=strrep(model.grRules{i},'_',''); 
-%end
-tic;
-ori_model=model;
-n=size(model.rxns,1);
-for i=1:n
-   if model.ub(i)>9999
-       model.ub(i)=1000;
-   end
-   if model.lb(i)<-9999
-       model.lb(i)=-1000;
-   end
-end
+%load a test model, e_coli_core/iMM904/iML1515
+load('e_coli_core.mat');
+model = e_coli_core;
 
-gvalue=[];
-gr=-1;pr=-1;it=0;success=0;
-%big=10;
-%big=1;
-options=cplexoptimset('cplex');
-options.mip.tolerances.integrality=10^(-12);
-%options=cplexoptimset('TolXInteger',10^(-12));
+%test on all possible target in above model
+target_names = readtable('possible_target_e_coli_core_no_e.csv', 'Delimiter', ',');
+% Start the overall timer for the loop
+overallTimer = tic;
 
-sss=sprintf('gDel-minRN%d.mat');
+% Initialize the cell array to accumulate all results
+allResults = cell(numel(target_names), 6); 
 
-[ori_model,targetRID,extype] = modelSetting(ori_model,targetMet)
-[model,targetRID,extype] = modelSetting(model,targetMet)
-
-m=size(model.mets,1);
-n=size(model.rxns,1);
-g=size(model.genes,1);
-vg=zeros(g,1);
-gid=find(model.c);
-pid=targetRID;
-model2=model;
-model2.c(gid)=0;
-model2.c(targetRID)=1;
-
-[optPre.x, optPre.f, optPre.stat, optPre.output] = ...
-        cplexlp(-model2.c, [],[], model2.S, zeros(m,1),model2.lb, model2.ub);
-if optPre.stat<=0 
-    display('no solution 1')
-    save(sss);
-    return;
-elseif -optPre.f < PRLB
-    display('TMPR < PRLB')
-    save(sss);
-    return;
-end
+% Loop through each target
+for i = 1:numel(target_names)
+    target = target_names{i,:}{1};
     
-model2=model;
-model.lb(pid)=PRLB;
-model.lb(gid)=GRLB;
-
-[opt0.x, opt0.f, opt0.stat, opt0.output] = ...
-    cplexlp(-model.c, [],[], model.S, zeros(m,1),model.lb, model.ub);
-TMGR=-opt0.f;
-big=TMGR; 
-[term,ng,nt,nr,nko,reactionKO,reactionKO2term] = readGeneRules(model);
- [f,intcon,A,b,Aeq,beq,lb,ub,xname] = geneReactionMILP(model,term,ng,nt,nr,nko,reactionKO);
- 
- lp.Aeq=[model.S zeros(m,ng+nt+nko);
-               zeros(size(Aeq,1),n) Aeq];
-lp.beq=[zeros(m,1); zeros(size(Aeq,1),1)];
-j=1;
-for i=1:size(model.grRules,1)
-    if isempty(model.grRules{i,:})==0
-        ind(1,j)=i;
-        j=j+1;
-    end
-end
-z1=-diag(model.ub);
-z2=diag(model.lb);
-z3=eye(n);
-
-lp.A=[zeros(size(A,1),n) A;
-           z3(ind,:) zeros(size(ind,2),ng+nt) z1(ind,ind);
-               -z3(ind,:) zeros(size(ind,2),ng+nt) z2(ind,ind)];
-lp.b=[b; zeros(2*nko,1)];
-lp.lb=[model.lb; lb];
-lp.ub=[model.ub; ub];
-lp.f=[-model.c; zeros(ng+nt,1); big*ones(nko,1)];
-for i=1:n
-    s1=repelem('C',n);
-    s2=repelem('B',ng+nt+nko);
-    lp.ctype=sprintf('%s%s',s1,s2);
-end
-A2=lp.A;
-b2=lp.b;
-
-it =1;
-while it<=maxLoop
-    it
-    gr=-1;pr=-1;
-    [opt.x, opt.f, opt.stat, opt.output] = ...
-        cplexmilp(lp.f, lp.A, lp.b, lp.Aeq, lp.beq,[],[],[],lp.lb, lp.ub,lp.ctype,[],options);
-
-    if opt.stat>0
-        for i=1:n
-            vx(i,it)=opt.x(i);
-            result{i,it+1}=opt.x(i);
-            result{i,1}=model.rxns{i};
-        end
-        for i=1:ng
-            vg(i,it)=opt.x(n+i);
-            result{n+i,1}=xname{i};
-            result{n+i,it+1}=vg(i,it);
-            gvalue{i,1}=xname{i};
-            gvalue{i,2}=vg(i,it)>0.1;
-        end
-        for i=1:nt
-            vt(i,1)=opt.x(n+ng+i);
-            result{n+ng+i,1}=xname{ng+i};
-            result{n+ng+i,it+1}=opt.x(n+ng+i);
-        end
-        for i=1:nko
-            vko(i,it)=opt.x(n+ng+nt+i);
-            result{n+ng+nt+i,1}=xname{ng+nt+i};
-            result{n+ng+nt+i,it+1}=opt.x(n+ng+nt+i);
-        end
-    %save('a.mat');return;
-    else
-        system('rm -f clone*.log');
-        if it==1
-            display('no solution 2')
-            save('a.mat');
-            return;
-        end
-        display('no more candidates')
-        system('rm -f clone*.log');
-        save(sss);
-        return;
-    end
-    [grRules] = calculateGR(ori_model,gvalue);
+    % Start the timer for gDel_minRN
+    tic;
+    [gvalue, gr, pr, it, success] = gDel_minRN(model, target, 10, 0.1, 0.1);
+    % Stop the timer for gDel_minRN and display the elapsed time
+    elapsedTime = toc;
     
-    lb2=ori_model.lb;
-    ub2=ori_model.ub;
-    for i=1:nr
-        if grRules{i,4}==0
-            lb2(i)=0;
-            ub2(i)=0;
-        end
-    end
-    [opt2.x, opt2.f, opt2.stat, opt2.output] = ...
-        cplexlp(-ori_model.c, [],[], model.S, zeros(m,1),lb2, ub2);
-    %save('a.mat');system('rm -f clone*.log');return;
-    grprList(it,:)=[opt2.x(gid) opt2.x(pid)];
-    gr=opt2.x(gid); pr=opt2.x(pid);
-    result2(:,it)=opt2.x;
-    
-    if (opt2.x(gid)>=GRLB) &&  (opt2.x(pid)>=PRLB)
-        [opt2.x(gid) opt2.x(pid)]
-        vg(:,it)
-        success=1;
-        time=toc;
-        system('rm -f clone*.log');
-        save(sss);
-        return;
-    end
-    
-    zeroList(:,it)=vko(:,it)<0.01;
-    dA=[zeros(1,nr+ng+nt) -(zeroList(:,it))'];
-    db=-1;
-    lp.A=[lp.A; dA];
-    lp.b=[lp.b; db];
-
-    it=it+1;
-    system('rm -f clone*.log');
-    save(sss);
-end
-vg=vg>0.1;
-save(sss);
+    % Save the gDel_minRN results into the allResults array
+    allResults{i, 1} = target;
+    allResults{i, 2} = elapsedTime;         % Elapsed Time 
+    allResults{i, 3} = gr;                  % gr 
+    allResults{i, 4} = pr;                  % pr 
+    allResults{i, 5} = it;                  % it 
+    allResults{i, 6} = success;             % success=1
 end
 
+% Stop the overall timer for the loop and display the elapsed time
+overallElapsedTime = toc(overallTimer);
+disp(['Overall Execution Time: ', num2str(overallElapsedTime), ' seconds']);
+
+% Convert the allResults cell array into a table for final CSV export
+finalResultsTable = cell2table(allResults, 'VariableNames', {'Target', 'Elapsed Time', 'gr', 'pr', 'it', 'success'});
+
+% Calculate the success rate (percentage of successful computations)
+successRate = sum([allResults{:, 6}] == 1) / numel(allResults) * 100;
+disp(['Overall Success Rate: ', num2str(successRate), '%']);
+
+% Save the final results into a single CSV file
+writetable(finalResultsTable, 'result_gDelminRN_e_coli_core.csv', 'WriteRowNames', false);
