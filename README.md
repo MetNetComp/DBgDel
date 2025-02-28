@@ -113,6 +113,12 @@ The calculation results for these examples are available in the following files:
 `Example_results/biotin_Strategy.mat`
 `Example_results/riboflavin_Strategy.mat`
 
+Note: Please unzip the required model file `CBM_model/iML1515.mat` from `CBM_model/iML1515.mat.zip` using the following command before testing:
+
+```
+unzip('CBM_model/iML1515.mat.zip', 'CBM_model');
+```
+
 ## Output Details
 The output contains a matrix `gvalue`, where:
 
