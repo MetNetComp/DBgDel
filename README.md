@@ -214,7 +214,13 @@ The results for each target are recorded, and the experiment summary is reported
 
 **(d) Quick Example Compare Test**
 
-We provide a function `compare_test_example()` to make a quick test comparing the results of DBgDel and gMCSE, targeting Succinate (succ_e) in the e_coli_core model.
+We provide an example to make a quick test comparing the results of DBgDel and gMCSE, targeting Succinate (succ_e) in the e_coli_core model.
+Calls the following in `Baselines` file to make the test:
+
+```
+compare_test_example()
+```
+
 The function saves the results into a text file, `compare_test_example_results.txt`, including:
 
 - Target: succ_e
