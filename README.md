@@ -71,12 +71,12 @@ Explanation:
 Execution:
 
 - The script's main block sets the folder path containing the CSV files and the output file path.
-- Calls the following in `Example_gene_deletion_data` file to test the entire process based on gene deletion data on e_coli_core model:
+- Calls the following to test the entire process based on gene deletion data of e_coli_core model:
 
 ```
-python Calculate_InitialG_e_coli_core.py
+python Calculate_Initial_Remaining_Gene_Set.py
 ```
-- To use this script, the default folder and output path are set to the script's directory. You can also use the code in lines 60-64 to replace "path" and "path/Remaining_gene.csv" with the actual paths where your CSV files are located and where you want to save the result.
+- To use this script, the default input folder is set to `Example_gene_deletion_data` and the output path is set to the script's directory. You can also use the code in lines 60-64 to replace "path" and "path/Remaining_gene.csv" with the actual paths where your gene deletion CSV files are located and where you want to save the result.
 
 For more detailed information, please refer to the comments within the source code.
 
