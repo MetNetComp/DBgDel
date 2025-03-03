@@ -76,7 +76,7 @@ Execution:
 ```
 python Calculate_Initial_Remaining_Gene_Set.py
 ```
-- To use this script, the default input folder is set to `Example_gene_deletion_data` and the output path is set to the script's directory. You can also use the code in lines 60-64 to replace "path" and "path/Remaining_gene.csv" with the actual paths where your gene deletion CSV files are located and where you want to save the result.
+- To use this script, the default input folder is set to `Example_gene_deletion_data` folder and the output path is set to the script's directory. You can also use the code in lines 60-64 to replace "path" and "path/Remaining_gene.csv" with the actual paths where your gene deletion CSV files are located and where you want to save the result.
 
 For more detailed information, please refer to the comments within the source code.
 
